@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SharePoint Navigation Menu</title>
+    <style>
+        /* === FLUENT DESIGN INSPIRED STYLING === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', sans-serif;
+            background-color: #ffffff;
+            padding: 20px;
+        }
+
+        .nav-container {
+            max-width: 400px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: 1px solid #edebe9;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-item {
+            position: relative;
+            border-bottom: 1px solid #edebe9;
+        }
+
+        .nav-item:last-child {
+            border-bottom: none;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: #323130;
+            font-size: 14px;
+            font-weight: 400;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            background: #ffffff;
+        }
+
+        .nav-link:hover {
+            background-color: #f3f2f1;
+            color: #106ebe;
+        }
+
+        .nav-link:active {
+            background-color: #edebe9;
+        }
+
+        /* Chevron icon for items with children */
+        .nav-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #605e5c;
+        }
+
+        .nav-icon svg {
+            width: 12px;
+            height: 12px;
+            fill: currentColor;
+        }
+
+        /* Rotate chevron when expanded */
+        .nav-item.expanded > .nav-link .nav-icon {
+            transform: rotate(90deg);
+        }
+
+        /* Hide chevron for items without children */
+        .nav-item.no-children .nav-icon {
+            opacity: 0;
+            width: 0;
+            margin-right: 0;
+        }
+
+        .nav-text {
+            flex: 1;
+        }
+
+        /* Submenu styling */
+        .nav-submenu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 0;
+            overflow: hidden;
+            background-color: #faf9f8;
+            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-item.expanded > .nav-submenu {
+            max-height: 2000px; /* Large enough to accommodate deep nesting */
+        }
+
+        /* Indentation for nested levels */
+        .nav-submenu .nav-link {
+            padding-left: 44px;
+            font-size: 13px;
+        }
+
+        .nav-submenu .nav-submenu .nav-link {
+            padding-left: 72px;
+            font-size: 13px;
+            background-color: #f3f2f1;
+        }
+
+        .nav-submenu .nav-submenu .nav-submenu .nav-link {
+            padding-left: 100px;
+            font-size: 12px;
+        }
+
+        /* Subtle left border for nested items */
+        .nav-submenu .nav-item {
+            border-left: 2px solid #d2d0ce;
+        }
+
+        .nav-submenu .nav-submenu .nav-item {
+            border-left: 2px solid #c8c6c4;
+        }
+
+        /* Hover effect for submenu items */
+        .nav-submenu .nav-link:hover {
+            background-color: #e1dfdd;
+            color: #106ebe;
+        }
+
+        .nav-submenu .nav-submenu .nav-link:hover {
+            background-color: #d2d0ce;
+        }
+
+        /* Smooth hover delay for better UX */
+        .nav-item {
+            transition: all 0.1s ease;
+        }
+
+        /* Optional: Add a subtle accent color */
+        .nav-item.expanded > .nav-link {
+            background-color: #f3f2f1;
+        }
+
+        /* Loading state */
+        .nav-container.loading {
+            opacity: 0.6;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .nav-container {
+                max-width: 100%;
+            }
+
+            body {
+                padding: 10px;
+            }
+        }
+
+        /* Accessibility: Focus states */
+        .nav-link:focus {
+            outline: 2px solid #106ebe;
+            outline-offset: -2px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Optional: Add a header */
+        .nav-header {
+            padding: 16px;
+            background: linear-gradient(135deg, #106ebe 0%, #0078d4 100%);
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 600;
+            border-bottom: 1px solid #0078d4;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-container" id="navContainer">
+        <!-- Optional header - remove if not needed -->
+        <div class="nav-header">Site Navigation</div>
+
+        <!-- Navigation menu will be inserted here by JavaScript -->
+        <ul class="nav-menu" id="navMenu"></ul>
+    </div>
+
+    <script>
+        // ========================================
+        // CUSTOMIZE YOUR SITE STRUCTURE HERE
+        // ========================================
+
+        const siteStructure = [
+            {
+                name: "HR Department",
+                url: "https://site.sharepoint.com/hr",
+                children: [
+                    {
+                        name: "Recruiting",
+                        url: "https://site.sharepoint.com/hr/recruiting",
+                        children: []
+                    },
+                    {
+                        name: "Benefits",
+                        url: "https://site.sharepoint.com/hr/benefits",
+                        children: [
+                            {
+                                name: "Health Insurance",
+                                url: "https://site.sharepoint.com/hr/benefits/health",
+                                children: []
+                            },
+                            {
+                                name: "Retirement Plans",
+                                url: "https://site.sharepoint.com/hr/benefits/retirement",
+                                children: []
+                            }
+                        ]
+                    },
+                    {
+                        name: "Employee Relations",
+                        url: "https://site.sharepoint.com/hr/relations",
+                        children: []
+                    }
+                ]
+            },
+            {
+                name: "IT Department",
+                url: "https://site.sharepoint.com/it",
+                children: [
+                    {
+                        name: "Help Desk",
+                        url: "https://site.sharepoint.com/it/helpdesk",
+                        children: [
+                            {
+                                name: "Tickets",
+                                url: "https://site.sharepoint.com/it/helpdesk/tickets",
+                                children: []
+                            },
+                            {
+                                name: "Knowledge Base",
+                                url: "https://site.sharepoint.com/it/helpdesk/kb",
+                                children: []
+                            }
+                        ]
+                    },
+                    {
+                        name: "Infrastructure",
+                        url: "https://site.sharepoint.com/it/infrastructure",
+                        children: []
+                    }
+                ]
+            },
+            {
+                name: "Finance Department",
+                url: "https://site.sharepoint.com/finance",
+                children: [
+                    {
+                        name: "Accounting",
+                        url: "https://site.sharepoint.com/finance/accounting",
+                        children: []
+                    },
+                    {
+                        name: "Budgeting",
+                        url: "https://site.sharepoint.com/finance/budgeting",
+                        children: []
+                    }
+                ]
+            },
+            {
+                name: "Operations",
+                url: "https://site.sharepoint.com/operations",
+                children: []
+            }
+        ];
+
+        // ========================================
+        // CONFIGURATION OPTIONS
+        // ========================================
+
+        const config = {
+            // Delay before expanding menu on hover (milliseconds)
+            hoverExpandDelay: 150,
+
+            // Delay before collapsing menu when mouse leaves (milliseconds)
+            hoverCollapseDelay: 300,
+
+            // Show chevron icon for items with children
+            showChevrons: true,
+
+            // Open links in new tab
+            openInNewTab: false
+        };
+
+        // ========================================
+        // NAVIGATION MENU FUNCTIONALITY
+        // ========================================
+
+        let hoverTimeout = null;
+        let collapseTimeout = null;
+
+        // Chevron SVG icon
+        const chevronIcon = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+                <path d="M5.5 3L11 8l-5.5 5V3z"/>
+            </svg>
+        `;
+
+        // Generate menu HTML from site structure
+        function generateMenuHTML(items, level = 0) {
+            if (!items || items.length === 0) return '';
+
+            let html = '<ul class="nav-submenu">';
+
+            items.forEach(item => {
+                const hasChildren = item.children && item.children.length > 0;
+                const childClass = hasChildren ? '' : 'no-children';
+
+                html += `
+                    <li class="nav-item ${childClass}" data-has-children="${hasChildren}">
+                        <a href="${item.url}" class="nav-link" ${config.openInNewTab ? 'target="_blank" rel="noopener noreferrer"' : ''}>
+                            ${config.showChevrons ? `<span class="nav-icon">${chevronIcon}</span>` : ''}
+                            <span class="nav-text">${item.name}</span>
+                        </a>
+                        ${hasChildren ? generateMenuHTML(item.children, level + 1) : ''}
+                    </li>
+                `;
+            });
+
+            html += '</ul>';
+            return html;
+        }
+
+        // Initialize the menu
+        function initMenu() {
+            const navMenu = document.getElementById('navMenu');
+
+            // Generate top-level menu items
+            siteStructure.forEach(item => {
+                const hasChildren = item.children && item.children.length > 0;
+                const childClass = hasChildren ? '' : 'no-children';
+
+                const li = document.createElement('li');
+                li.className = `nav-item ${childClass}`;
+                li.setAttribute('data-has-children', hasChildren);
+
+                li.innerHTML = `
+                    <a href="${item.url}" class="nav-link" ${config.openInNewTab ? 'target="_blank" rel="noopener noreferrer"' : ''}>
+                        ${config.showChevrons ? `<span class="nav-icon">${chevronIcon}</span>` : ''}
+                        <span class="nav-text">${item.name}</span>
+                    </a>
+                    ${hasChildren ? generateMenuHTML(item.children) : ''}
+                `;
+
+                navMenu.appendChild(li);
+            });
+
+            // Attach hover event listeners
+            attachHoverListeners();
+        }
+
+        // Attach hover event listeners to all nav items
+        function attachHoverListeners() {
+            const navItems = document.querySelectorAll('.nav-item[data-has-children="true"]');
+
+            navItems.forEach(item => {
+                const link = item.querySelector('.nav-link');
+
+                // Mouse enter - expand submenu
+                item.addEventListener('mouseenter', function(e) {
+                    // Clear any pending collapse
+                    if (collapseTimeout) {
+                        clearTimeout(collapseTimeout);
+                        collapseTimeout = null;
+                    }
+
+                    // Delay expansion for smoother UX
+                    hoverTimeout = setTimeout(() => {
+                        // Close siblings at the same level
+                        const parent = item.parentElement;
+                        const siblings = parent.querySelectorAll(':scope > .nav-item');
+                        siblings.forEach(sibling => {
+                            if (sibling !== item) {
+                                sibling.classList.remove('expanded');
+                            }
+                        });
+
+                        // Expand this item
+                        item.classList.add('expanded');
+                    }, config.hoverExpandDelay);
+                });
+
+                // Mouse leave - collapse submenu
+                item.addEventListener('mouseleave', function(e) {
+                    // Clear any pending expansion
+                    if (hoverTimeout) {
+                        clearTimeout(hoverTimeout);
+                        hoverTimeout = null;
+                    }
+
+                    // Delay collapse to allow moving to submenu
+                    collapseTimeout = setTimeout(() => {
+                        item.classList.remove('expanded');
+                    }, config.hoverCollapseDelay);
+                });
+            });
+        }
+
+        // Initialize menu when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initMenu);
+        } else {
+            initMenu();
+        }
+    </script>
+</body>
+</html>
