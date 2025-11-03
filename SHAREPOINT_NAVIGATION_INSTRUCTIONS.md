@@ -20,36 +20,112 @@ This is a hover-to-expand hierarchical navigation menu designed specifically for
 
 ## How to Add to SharePoint
 
-### Step 1: Copy the Code
+**Important Note**: Modern SharePoint's Embed web part only supports iframe-based embeds. Choose one of the methods below based on what's available in your SharePoint environment.
 
-1. Open the file `sharepoint-hover-nav-menu.html` in a text editor
-2. Select all the code (Ctrl+A or Cmd+A)
-3. Copy it to your clipboard (Ctrl+C or Cmd+C)
+---
 
-### Step 2: Add to SharePoint Page
+### Method 1: Upload to SharePoint & Embed via iframe (RECOMMENDED)
+
+This is the most reliable method for modern SharePoint pages.
+
+#### Step 1: Customize the HTML File
+
+1. Open `sharepoint-hover-nav-menu.html` in a text editor
+2. Edit the `siteStructure` array with your site links (see customization section below)
+3. Save the file
+
+#### Step 2: Upload to SharePoint
 
 1. Navigate to your SharePoint site
-2. Go to the page where you want to add the navigation menu
-3. Click **"Edit"** at the top right of the page
-4. Click the **"+"** icon to add a new web part where you want the menu
-5. Search for **"Embed"** in the web part picker
-6. Select the **"Embed"** web part
-7. In the Embed web part, paste your copied HTML code
-8. Click outside the web part or click **"Apply"**
-9. Click **"Publish"** or **"Republish"** to save your changes
+2. Go to **Site Contents** > **Documents** (or create a new document library)
+3. Create a folder called "Navigation" (optional, for organization)
+4. Upload your `sharepoint-hover-nav-menu.html` file
+5. Click on the uploaded file to open it
+6. Copy the URL from your browser's address bar (it will look like: `https://yoursite.sharepoint.com/sites/yoursite/Documents/sharepoint-hover-nav-menu.html`)
 
-### Alternative: Using the Script Editor Web Part (Classic Pages)
+#### Step 3: Embed on SharePoint Page
 
-If you're using classic SharePoint pages:
+1. Go to the page where you want the navigation menu
+2. Click **"Edit"** at the top right
+3. Click the **"+"** icon to add a new web part
+4. Search for **"Embed"** and select the **Embed web part**
+5. In the Embed web part, paste this code (replace YOUR_FILE_URL with the URL you copied):
+
+```html
+<iframe src="YOUR_FILE_URL" width="100%" height="600" frameborder="0" scrolling="no"></iframe>
+```
+
+Example:
+```html
+<iframe src="https://contoso.sharepoint.com/sites/hr/Documents/sharepoint-hover-nav-menu.html" width="100%" height="600" frameborder="0" scrolling="no"></iframe>
+```
+
+6. Adjust the `height` value as needed (e.g., 400, 800, etc.)
+7. Click outside the web part or click **"Apply"**
+8. Click **"Publish"** to save your changes
+
+**Pro Tip**: To remove scrollbars and make it seamlessly integrated, you may need to adjust the iframe height to match your menu's actual height.
+
+---
+
+### Method 2: Use GitHub Pages or External Hosting (Alternative)
+
+If your organization allows external embeds:
+
+1. Host the HTML file on GitHub Pages, Azure Static Web Apps, or any web server
+2. Get the public URL (e.g., `https://username.github.io/navigation-menu.html`)
+3. Use the Embed web part with iframe code:
+
+```html
+<iframe src="YOUR_HOSTED_URL" width="100%" height="600" frameborder="0"></iframe>
+```
+
+---
+
+### Method 3: Script Editor Web Part (Classic Pages Only)
+
+If you're using **classic SharePoint pages**, you can paste the code directly:
 
 1. Edit your page
-2. Insert > Web Part
+2. Click **Insert** > **Web Part**
 3. Under "Media and Content" category, select **"Script Editor"**
 4. Click "Add"
 5. In the Script Editor web part, click **"EDIT SNIPPET"**
-6. Paste your HTML code
-7. Click "Insert"
-8. Save the page
+6. Open `sharepoint-hover-nav-menu.html` and copy ALL the code
+7. Paste into the Script Editor
+8. Click "Insert"
+9. Save the page
+
+---
+
+### Method 4: Code Section (If Available)
+
+Some SharePoint tenants have a "Code" section feature enabled:
+
+1. Edit your SharePoint page
+2. Click the **"+"** icon to add a new section
+3. Look for **"Code"** in the section options
+4. If available, select it and paste your HTML code
+5. The code will run directly on the page
+
+**Note**: This feature must be enabled by your SharePoint admin and may not be available in all environments.
+
+---
+
+### Troubleshooting Access Issues
+
+If the iframe shows "Access Denied" or doesn't load:
+
+1. **Check file permissions**: Make sure the HTML file has read permissions for "Everyone" or your intended audience
+   - Right-click the file > Manage Access > Share with appropriate users/groups
+
+2. **Check library permissions**: Ensure the document library is accessible to your users
+
+3. **Try a different library**: Some libraries have stricter permissions. Try uploading to the "Site Assets" library instead
+
+4. **Browser security**: Some browsers block iframes. Test in Microsoft Edge (recommended for SharePoint)
+
+5. **Content Security Policy**: Your SharePoint admin may need to allow iframe embeds. Contact your IT department if iframes are blocked
 
 ---
 
@@ -379,16 +455,21 @@ const siteStructure = [
 
 ## Quick Start Checklist
 
-- [ ] Copy the entire `sharepoint-hover-nav-menu.html` code
+- [ ] Open `sharepoint-hover-nav-menu.html` in a text editor
 - [ ] Edit the `siteStructure` array with your site links
-- [ ] Add the Embed web part to your SharePoint page
-- [ ] Paste the code into the Embed web part
+- [ ] Save the file
+- [ ] Upload the HTML file to SharePoint Documents library
+- [ ] Copy the file's URL
+- [ ] Add Embed web part to your SharePoint page
+- [ ] Paste iframe code with your file URL into the Embed web part
+- [ ] Adjust iframe height as needed
 - [ ] Publish the page
 - [ ] Test the hover functionality
-- [ ] Adjust styling/timing as needed
+- [ ] Share file permissions if needed
 
 ---
 
-**Version**: 1.0
+**Version**: 1.1
 **Last Updated**: 2025-11-03
 **Compatible with**: SharePoint Online (Modern & Classic)
+**Update**: Added iframe-based embedding instructions for modern SharePoint
